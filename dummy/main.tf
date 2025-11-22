@@ -69,7 +69,7 @@ resource "azurerm_linux_virtual_machine" "example" {
   admin_ssh_key {
     username   = "azureuser"
     # USE THE FULL PATH
-    public_key = file("C:/Users/SREE/.ssh/id_rsa.pub") 
+    public_key = file("id_rsa.pub") 
   }
 
   os_disk {
