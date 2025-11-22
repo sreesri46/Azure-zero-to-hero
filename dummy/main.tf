@@ -55,36 +55,41 @@ resource "azurerm_network_interface" "example" {
 }
 
 resource "azurerm_linux_virtual_machine" "example" {
-  # All required attributes (name, location, size, etc.) go here...
   name                  = "example-machine"
   resource_group_name   = azurerm_resource_group.example.name
   location              = azurerm_resource_group.example.location
   size                  = "Standard_F2"
-  admin_username        = "adminuser"
+  
+  # Ensure this username matches the local user path if you use the os_profile_linux_config block
+  admin_username        = "adminuser" 
+  
   network_interface_ids = [
     azurerm_network_interface.example.id,
   ]
 
-  disable_password_authentication = true
-
+  # 1. Use os_profile_linux_config to disable password auth (BEST PRACTICE)
+  os_profile_linux_config {
+    disable_password_authentication = true
+  }
+  
+  # 2. Use admin_ssh_key block for key injection (PREFERRED METHOD)
   admin_ssh_key {
+    # This is the path where the key is placed *inside* the VM for the admin_username
     username   = "adminuser"
-    public_key = ""
+    
+    # Use the file() function here to read the public key content from your local machine
+    public_key = file("id_rsa.pub") 
   }
 
-  # 👇 Block 2: MUST be here, nested inside the resource { ... }
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
 
-  # 👇 Block 3: MUST be here, nested inside the resource { ... }
   source_image_reference {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-jammy"
     sku       = "22_04-lts"
     version   = "latest"
   }
-
-# 👇 The resource block MUST close here, after all its configuration is done.
 }
