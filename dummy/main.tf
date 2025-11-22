@@ -55,6 +55,7 @@ resource "azurerm_network_interface" "example" {
 }
 
 resource "azurerm_linux_virtual_machine" "example" {
+  # All required attributes (name, location, size, etc.) go here...
   name                  = "example-machine"
   resource_group_name   = azurerm_resource_group.example.name
   location              = azurerm_resource_group.example.location
@@ -63,25 +64,29 @@ resource "azurerm_linux_virtual_machine" "example" {
   network_interface_ids = [
     azurerm_network_interface.example.id,
   ]
-  
-  # 👇 This is the correct placement for the Linux configuration block
+
+  # 👇 Block 1: MUST be here, nested inside the resource { ... }
   os_profile_linux_config {
-    disable_password_authentication = true # Best practice when using SSH keys
+    disable_password_authentication = true
     ssh_keys {
-      path       = "/home/adminuser/.ssh/authorized_keys" # Note: Use admin_username here
+      path       = "/home/adminuser/.ssh/authorized_keys"
       public_key = file("id_rsa.pub")
     }
   }
 
+  # 👇 Block 2: MUST be here, nested inside the resource { ... }
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
 
+  # 👇 Block 3: MUST be here, nested inside the resource { ... }
   source_image_reference {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-jammy"
     sku       = "22_04-lts"
     version   = "latest"
   }
+
+# 👇 The resource block MUST close here, after all its configuration is done.
 }
