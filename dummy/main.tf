@@ -13,10 +13,9 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "my-new-rg"
+  name    = "my-new-rg"
   location = "East US"
 
-  # ADD THIS BLOCK
   tags = {
     Environment = "Testing"
   }
@@ -36,10 +35,10 @@ resource "azurerm_subnet" "example" {
 }
 
 resource "azurerm_public_ip" "example" {
-  name                     = "example_pip"
+  name                = "example_pip"
   resource_group_name = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  allocation_method        = "Dynamic"
+  location            = azurerm_resource_group.example.location
+  allocation_method   = "Dynamic"
 }
 
 resource "azurerm_network_interface" "example" {
@@ -56,28 +55,23 @@ resource "azurerm_network_interface" "example" {
 }
 
 resource "azurerm_linux_virtual_machine" "example" {
-  name                = "example-machine"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  size                = "Standard_F2"
-  admin_username      = "adminuser"
+  name                  = "example-machine"
+  resource_group_name   = azurerm_resource_group.example.name
+  location              = azurerm_resource_group.example.location
+  size                  = "Standard_F2"
+  admin_username        = "adminuser"
   network_interface_ids = [
     azurerm_network_interface.example.id,
   ]
-
-  resource "azurerm_linux_virtual_machine" "example" {
-  # ... other configuration ...
-
+  
+  # 👇 This is the correct placement for the Linux configuration block
   os_profile_linux_config {
-    # ... other configuration ...
+    disable_password_authentication = true # Best practice when using SSH keys
     ssh_keys {
-      path     = "/home/azureuser/.ssh/authorized_keys" # This is the path *inside* the VM
-      public_key = file("id_rsa.pub")                 # This is the path *on your local machine*
+      path       = "/home/adminuser/.ssh/authorized_keys" # Note: Use admin_username here
+      public_key = file("id_rsa.pub")
     }
   }
-
-  # ... other configuration ...
-}
 
   os_disk {
     caching              = "ReadWrite"
