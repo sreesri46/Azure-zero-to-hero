@@ -12,9 +12,13 @@ provider "azurerm" {
   features {}
 }
 
+## Azure Foundation Resources ##
+# -----------------------------
+
 resource "azurerm_resource_group" "example" {
   name     = "example-resources1"
-  location = "EAST US"
+  # Best practice: use lowercase for Azure locations
+  location = "eastus" 
 }
 
 resource "azurerm_virtual_network" "example" {
@@ -32,10 +36,10 @@ resource "azurerm_subnet" "example" {
 }
 
 resource "azurerm_public_ip" "example" {
-  name                     = "example_pip"
+  name                = "example_pip"
   resource_group_name = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  allocation_method        = "Dynamic"
+  location            = azurerm_resource_group.example.location
+  allocation_method   = "Dynamic"
 }
 
 resource "azurerm_network_interface" "example" {
@@ -51,19 +55,31 @@ resource "azurerm_network_interface" "example" {
   }
 }
 
+# -----------------------------
+## Azure Linux Virtual Machine ##
+# -----------------------------
+
 resource "azurerm_linux_virtual_machine" "example" {
-  name                = "example-machine"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  size                = "Standard_F2"
-  admin_username      = "adminuser"
+  name                  = "example-machine"
+  resource_group_name   = azurerm_resource_group.example.name
+  location              = azurerm_resource_group.example.location
+  size                  = "Standard_F2"
+  admin_username        = "adminuser"
   network_interface_ids = [
     azurerm_network_interface.example.id,
   ]
 
+  # SSH Key Configuration (Best Practice)
+  os_profile_linux_config {
+    # This disables password login, forcing SSH key usage
+    disable_password_authentication = true
+  }
+
   admin_ssh_key {
+    # The username must match the admin_username
     username   = "adminuser"
-    public_key = file("~/.ssh/id_rsa.pub")
+    # This path MUST be correct on your local machine
+    public_key = file("C:/Users/SREE/.ssh/id_rsa.pub") 
   }
 
   os_disk {
