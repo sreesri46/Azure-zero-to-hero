@@ -65,12 +65,19 @@ resource "azurerm_linux_virtual_machine" "example" {
     azurerm_network_interface.example.id,
   ]
 
+  resource "azurerm_linux_virtual_machine" "example" {
   # ... other configuration ...
-  admin_ssh_key {
-    username   = "azureuser"
-    # USE THE FULL PATH
-    public_key = file("id_rsa.pub") 
+
+  os_profile_linux_config {
+    # ... other configuration ...
+    ssh_keys {
+      path     = "/home/azureuser/.ssh/authorized_keys" # This is the path *inside* the VM
+      public_key = file("id_rsa.pub")                 # This is the path *on your local machine*
+    }
   }
+
+  # ... other configuration ...
+}
 
   os_disk {
     caching              = "ReadWrite"
