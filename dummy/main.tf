@@ -39,7 +39,11 @@ resource "azurerm_public_ip" "example" {
   name                = "example_pip"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static" # Standard SKU requires Static allocation
+  
+  # 👇 ADD THESE TWO LINES TO FIX THE LIMIT ERROR
+  sku                 = "Standard"
+  sku_tier            = "Regional" 
 }
 
 resource "azurerm_network_interface" "example" {
