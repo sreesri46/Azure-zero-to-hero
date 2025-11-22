@@ -69,7 +69,7 @@ resource "azurerm_linux_virtual_machine" "example" {
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key = file("id_rsa.pub")
+    public_key = file(" ~/.ssh/id_rsa.pub")
   }
 
   # 👇 Block 2: MUST be here, nested inside the resource { ... }
