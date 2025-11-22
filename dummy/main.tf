@@ -65,13 +65,11 @@ resource "azurerm_linux_virtual_machine" "example" {
     azurerm_network_interface.example.id,
   ]
 
-  # 👇 Block 1: MUST be here, nested inside the resource { ... }
-  os_profile_linux_config {
-    disable_password_authentication = true
-    ssh_keys {
-      path       = "/home/adminuser/.ssh/authorized_keys"
-      public_key = file("id_rsa.pub")
-    }
+  disable_password_authentication = true
+
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = file("id_rsa.pub")
   }
 
   # 👇 Block 2: MUST be here, nested inside the resource { ... }
