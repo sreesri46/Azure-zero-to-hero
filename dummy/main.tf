@@ -70,17 +70,11 @@ resource "azurerm_linux_virtual_machine" "example" {
   ]
 
   # SSH Key Configuration (Best Practice)
-  os_profile_linux_config {
-    # This disables password login, forcing SSH key usage
-    disable_password_authentication = true
-  }
-
   admin_ssh_key {
-    # The username must match the admin_username
     username   = "adminuser"
-    # This path MUST be correct on your local machine
-    public_key = file("C:/Users/SREE/.ssh/id_rsa.pub") 
+    public_key = file("C:/Users/SREE/.ssh/id_rsa.pub")
   }
+  disable_password_authentication = true
 
   os_disk {
     caching              = "ReadWrite"
